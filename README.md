@@ -284,6 +284,172 @@ const App = () => {
 // ...
 ```
 此时在页面上点击 `BuyIceCream` 按钮就可以观察到冰激凌数量的变化了。
+以上内容的完整代码在本项目的 ChapterTwo 分支。
+
+## 3. 买冰激凌是要付钱的！处理数据之间的关系
+
+在上一章，在页面上点击 `BuyIceCream` 按钮后，冰激凌的数量增加了，但是钱却没有减少。本章将处理这个问题，同时实现页面上重置按钮的功能。
+
+### 3.1 按下购买按钮后，发生了什么？
+
+首先明确，按下购买按钮后，按钮对应的 `onClick={() => dispatch(buyIcecream())}` 增加了冰激凌的数量，却没有减少钱的数量。买冰激凌不付钱，这可是不允许滴。
+
+因此，这个按钮需要实现两件事情：
+1. 增加冰激凌的数量；
+2. 减少钱的数量。假设一个冰激凌的价格是 1.5$, 我们需要一个 reducer 函数去对应减少 `money` 的数值。
+
+而我们目前并没有能实现这一操作的 reducer 函数。
+
+回顾一下，第一章 `money.js` 中定义了两个 reducer 函数，分别是将 `money` 的数值增加5或者减少5。
+
+因此我们需要新的 reducer 函数来处理购买时钱的变化。同时，我们希望这个新的 reducer 函数能够接受冰激凌的价格作为参数。
+
+### 3.2 在 `money.js` 中新增一个能接受参数的 reducer 函数
+
+事实上，在定义 reducer 函数时，可以通过 `action.payload` 来获取传入的参数。
+
+在 `money.js` 中定义一个 `decreaseByAmount` 的 reducer 函数，和之前不同的是，它的参数是 `(state, action)`，以此让我们获取传入参数的情况。
+
+```
+// src/store/reducers/money.js
+
+// ...
+
+export const moneySlice = createSlice({
+    // ...
+    reducers: {
+        // ...
+        // 可以通过action.payload来获取传入的参数
+        decrementByAmount: (state, action) => {
+            state.value -= action.payload;
+        },
+    }
+})
+
+```
+
+修改完成后，别忘了导出：
+
+```
+// src/store/reducers/money.js
+
+// ...
+export const { increment, decrement, decrementByAmount } = moneySlice.actions; // 别忘记导出 decrementByAmount
+export default moneySlice.reducer;
+```
+
+### 3.3 修改购买按钮的逻辑
+
+接下来，就可以修改购买按钮的逻辑，实现冰激凌数量增加和钱的减少。
+
+首先在 `App.js` 中引入 `decreaseByAmount`：
+
+```
+// src/App.js
+
+// ...
+import { increment, decrement, decrementByAmount } from './store/reducers/money';
+// ...
+```
+
+然后，在 `const App` 中新增一个函数 `HandleBuyIcecream`，用以实现冰激凌数量增加和钱的减少这两个动作，并将其传给购买按钮的 `onClick` 属性。
+```
+// src/App.js
+
+// ...
+const App = () => {
+    // ...
+    const HandleBuyIcecream = () => {
+    // 创建一个函数，用以实现冰激凌数量增加和钱的减少这两个动作
+        dispatch(buyIcecream());
+        dispatch(decrementByAmount(1.5));
+    }
+    return (
+        {/* ... */}
+        <button onClick={HandleBuyIcecream}>Buy IceCream</button> <br />
+        {/* ... */}
+    )
+}
+
+// ...
+```
+这样一来，就能在点击购买按钮时观察到冰激凌和钱同时变化了！
+
+### 3.4 实现 Reset 按钮
+
+页面上的 Reset 按钮用于将钱和冰激凌的数量都重置为 `0`。同样地，我们也需要在 `money.js` 和 `icecream.js` 中实现相应的 reducer 函数。
+
+```
+// src/store/reducers/money.js
+
+// ...
+
+export const moneySlice = createSlice({
+    // ...
+    reducers: {
+        // ...
+        // 实现 reset 的 case reducer
+        resetMoney: (state) => {
+            state.value = 0;
+        },
+    }
+})
+
+// 记得导出 resetMoney
+export const { increment, decrement, decrementByAmount, resetMoney } = moneySlice.actions;
+// ...
+```
+
+```
+// src/store/reducers/icecream.js
+
+// ...
+
+export const icecreamSlice = createSlice({
+    // ...
+    reducers: {
+        // ...
+        // 实现 reset 的 case reducer
+        resetIcecream: (state) => {
+            state.value = 0;
+        },
+    }
+})
+
+// 记得导出 resetIcecream
+export const { increment, resetIcecream } = icecreamSlice.actions;
+// ...
+```
+
+接下来，修改 `App.js`：
+
+```
+// src/app.js
+
+// ...
+import { increment, decrement, decrementByAmount, resetMoney } from './store/reducers/money'; // 引入 resetMoney
+import { increment as buyIcecream, resetIcecream } from './store/reducers/icecream'; // 引入 resetIcecream
+
+const App = () => {
+  // ...
+  const HandleReset = () => {
+    // 创建一个函数，用以实现重置的动作 (*3.4)
+    dispatch(resetMoney());
+    dispatch(resetIcecream());
+  }
+
+  return (
+    // ...
+      {/* 处理reset button的点击 （*3.4）*/}
+      <button onClick={HandleReset}>Reset</button>
+    // ...
+  );
+}
+
+// ...
+```
+这样一来，Reset 按钮正常工作了！
+
 
 ## 参考资料
 https://www.redux.org.cn/introduction/why-rtk-is-redux-today.html

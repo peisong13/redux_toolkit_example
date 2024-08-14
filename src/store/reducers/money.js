@@ -14,11 +14,19 @@ export const moneySlice = createSlice({
         decrement: (state) => {
             state.value -= 5;
         },
+        // 可以通过action.payload来获取传入的参数 (*3.2)
+        decrementByAmount: (state, action) => {
+            state.value -= action.payload;
+        },
+        // 实现 reset 的 case reducer （*3.4）
+        resetMoney: (state) => {
+            state.value = 0;
+        },
     },
 })
 
 // 导出每个case reducer对应的action creator（*1.4.4）
-export const { increment, decrement } = moneySlice.actions;
+export const { increment, decrement, decrementByAmount, resetMoney } = moneySlice.actions;
 
 // 导出整个reducer（*1.4.4）
 export default moneySlice.reducer;

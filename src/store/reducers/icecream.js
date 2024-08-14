@@ -10,8 +10,12 @@ export const icecreamSlice = createSlice({
         increment: (state) => {
             state.value += 1;
         },
+        // 实现 reset 的 case reducer （*3.4）
+        resetIcecream: (state) => {
+            state.value = 0;
+        },
     },
 })
 
-export const { increment } = icecreamSlice.actions;
+export const { increment, resetIcecream } = icecreamSlice.actions;
 export default icecreamSlice.reducer;
