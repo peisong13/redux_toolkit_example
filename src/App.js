@@ -8,7 +8,7 @@ const App = () => {
   return (
     <div className="App">
       Money: {money}$
-      {/* 使用useDispatch在对应Button按下时触发对应的action */}
+      {/* 使用useDispatch在对应Button按下时触发对应的action （*1.6.3）*/}
       <button onClick={() => dispatch(increment())}>+</button>
       <button onClick={() => dispatch(decrement())}>-</button> <br />
 
