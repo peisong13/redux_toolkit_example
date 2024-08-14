@@ -284,6 +284,7 @@ const App = () => {
 // ...
 ```
 此时在页面上点击 `BuyIceCream` 按钮就可以观察到冰激凌数量的变化了。
+
 以上内容的完整代码在本项目的 ChapterTwo 分支。
 
 ## 3. 买冰激凌是要付钱的！处理数据之间的关系
@@ -450,8 +451,67 @@ const App = () => {
 ```
 这样一来，Reset 按钮正常工作了！
 
+以上内容的完整代码在本项目的 ChapterThree 分支。
+
+## 4. 不可以透支！为数据添加验证
+
+### 4.1 为“-”按钮添加数据验证
+
+Reducer 函数支持更加复杂的更新逻辑。当前，“-”按钮允许将钱的金额减至负数。为了避免这一情况，我们可以在其对应的 reducer 函数中添加数据验证：
+
+```
+// src/store/reducers/money.js
+
+export const moneySlice = createSlice({
+    // ...
+    reducers: {
+        // ...
+        decrement: (state) => {
+            // 为了防止用户减少钱时没有足够的钱，在这里添加一个判断条件
+            if (state.value < 5) {
+                alert("没有足够的钱，每次减少5刀!");
+                return;
+            }
+            state.value -= 5;
+        },
+        // ...
+    },
+})
+
+// ...
+
+```
+此时再点击“-”按钮，当金额不足5刀时会弹出一个 alert 框并阻止用户的操作。
+
+### 4.2 为购买按钮添加数据验证
+
+最后，为购买按钮添加数据验证，当金额不足 1.5$ 时，阻止用户的购买行为。直接修改 `const App` 中的 `handleBuyIcecream` 函数即可。
+
+```
+// src/App.js
+
+// ...
+
+const App = () => {
+    // ...
+    const HandleBuyIcecream = () => {
+        // 为了防止用户购买冰激凌时没有足够的钱，在这里添加一个判断条件
+        if (money < 1.5) {
+            alert("没有足够的钱，冰激凌每个1.5刀!");
+            return;
+        }
+        dispatch(buyIcecream());
+        dispatch(decrementByAmount(1.5));
+  }
+}
+```
+
+大功告成！炎炎夏日，快去买些冰激凌吧！
+
+以上内容的完整代码在本项目的 ChapterFour 分支。
 
 ## 参考资料
 https://www.redux.org.cn/introduction/why-rtk-is-redux-today.html
 https://www.redux.org.cn/tutorials/quick-start.html
 https://www.redux.org.cn/tutorials/essentials/part-2-app-structure.html
+https://www.redux.org.cn/tutorials/fundamentals/part-8-modern-redux.html

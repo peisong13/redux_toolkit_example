@@ -10,6 +10,11 @@ const App = () => {
   const icecream = useSelector((state) => state.icecream.value); // 从store中获取icecream的值 （*2.3）
 
   const HandleBuyIcecream = () => {
+    // 为了防止用户购买冰激凌时没有足够的钱，在这里添加一个判断条件 （*4.2）
+    if (money < 1.5) {
+      alert("没有足够的钱，冰激凌每个1.5刀!");
+      return;
+    }
     // 创建一个函数，用以实现冰激凌数量增加和钱的减少这两个动作 （*3.3）
     dispatch(buyIcecream());
     dispatch(decrementByAmount(1.5));

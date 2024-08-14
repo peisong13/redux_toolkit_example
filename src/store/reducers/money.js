@@ -12,6 +12,11 @@ export const moneySlice = createSlice({
             state.value += 5;
         },
         decrement: (state) => {
+            // 为了防止用户减少钱时没有足够的钱，在这里添加一个判断条件 (*4.1)
+            if (state.value < 5) {
+                alert("没有足够的钱，每次减少5刀!");
+                return;
+            }
             state.value -= 5;
         },
         // 可以通过action.payload来获取传入的参数 (*3.2)
